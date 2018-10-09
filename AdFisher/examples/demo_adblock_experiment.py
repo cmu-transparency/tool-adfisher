@@ -1,5 +1,5 @@
 import sys, os
-sys.path.append("../core")          # files from the core 
+sys.path.insert(0, "../core")       # files from the core
 import adfisher                     # adfisher wrapper function
 import web.pre_experiment.alexa     # collecting top sites from alexa
 import web.adblock_ads              # collecting ads
@@ -12,7 +12,7 @@ adblock_rules = web.adblock_ads.AdBlockUnit(log_file=log_file).rules
 
 # Defines the browser that will be used as a "unit" and gives it a copy of the adblock_rules
 def make_browser(unit_id, treatment_id):
-    b = web.adblock_ads.AdBlockUnit(log_file=log_file, unit_id=unit_id, 
+    b = web.adblock_ads.AdBlockUnit(log_file=log_file, unit_id=unit_id,
         treatment_id=treatment_id, headless=True,rules=adblock_rules)
     return b
 
@@ -36,7 +36,7 @@ def measurement(unit):
             "http://www.theguardian.com/us",
             "http://timesofindia.indiatimes.com/international-home",
             "http://www.bbc.com/news/"]
-    
+
     for site in sites:
         unit.collect_ads(site,reloads=2,delay=5)
         #unit.visit_url(site)
@@ -61,9 +61,9 @@ def load_results():
 def test_stat(observed_values, unit_assignments):
     pass
 
-adfisher.do_experiment(make_unit=make_browser, treatments=[control_treatment, exp_treatment], 
+adfisher.do_experiment(make_unit=make_browser, treatments=[control_treatment, exp_treatment],
                         measurement=measurement, end_unit=cleanup_browser,
-                        load_results=load_results, test_stat=test_stat, ml_analysis=False, 
+                        load_results=load_results, test_stat=test_stat, ml_analysis=False,
                         num_blocks=1, num_units=4, timeout=3000,
-                        log_file=log_file, exp_flag=True, analysis_flag=False, 
+                        log_file=log_file, exp_flag=True, analysis_flag=False,
                         treatment_names=["control", "experimental"])

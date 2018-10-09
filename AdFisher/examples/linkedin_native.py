@@ -1,5 +1,5 @@
 import sys, os
-sys.path.append("../core")          # files from the core 
+sys.path.insert(0, "../core")       # files from the core
 import adfisher                     # adfisher wrapper function
 import web.linkedin_ads
 import converter.reader             # read log and create feature vectors
@@ -44,12 +44,8 @@ def test_stat(observed_values, unit_assignments):
 
 
 
-adfisher.do_experiment(make_unit=make_browser, treatments=[control_treatment, exp_treatment], 
+adfisher.do_experiment(make_unit=make_browser, treatments=[control_treatment, exp_treatment],
                         measurement=measurement, end_unit=cleanup_browser,
-                        load_results=load_results, test_stat=test_stat, ml_analysis=True, 
+                        load_results=load_results, test_stat=test_stat, ml_analysis=True,
                         num_blocks=13, num_units=2, timeout=1000, log_file=log_file, exp_flag=False,
                         treatment_names=["control (female)", "experimental (male)"])
-
-
-
-

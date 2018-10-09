@@ -1,5 +1,5 @@
 import sys, os
-sys.path.append("../core")          # files from the core
+sys.path.insert(0, "../core")       # files from the core
 import adfisher                     # adfisher wrapper function
 import web.indeed_ads
 import converter.reader             # read log and create feature vectors
@@ -48,9 +48,3 @@ adfisher.do_experiment(make_unit=make_browser, treatments=[control_treatment, ex
                         num_blocks=13, num_units=2, timeout=2000,
                         log_file=log_file, exp_flag=True, analysis_flag=True,
                         treatment_names=["female", "male"])
-
-
-
-
-
-

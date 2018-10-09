@@ -1,4 +1,3 @@
-
 import os
 import sys
 import json
@@ -10,11 +9,11 @@ def load_ads_from_json(log_name,session):
     # The save file name format is "adb_logfile.session.json
     dirname = os.path.dirname(log_name)
     base=os.path.splitext(os.path.basename(log_name))[0][4:]
-    json_name  = base+"."+session+".json" 
+    json_name  = base+"."+session+".json"
     json_file = os.path.join(dirname,json_name)
     with open(json_file, 'r') as infile:
         raw_ad_lines = json.load(infile)
-    
+
     print("loaded {} lines from session: {}".format(len(raw_ad_lines),session))
 
     ad_lines =[]
@@ -24,7 +23,7 @@ def load_ads_from_json(log_name,session):
         ad_lines.append(Ad(*utf8_line))
 
     return ad_lines
-    
+
 def find_json_logs(log_file):
     json_logs=[]
     with open(log_file,'r') as log:
@@ -41,7 +40,7 @@ def get_site_reloads(ad_lines):
     sites = set()
     for ad in ad_lines:
         sites.add((ad.on_site,ad.reloads))
-    
+
     return sorted(list(sites),key=lambda s: s[1])
 
 def get_ad_element(ad_lines,element):
@@ -51,7 +50,7 @@ def get_ad_element(ad_lines,element):
     sites = set()
     for ad in ad_lines:
         sites.add(getattr(ad, element))
-    
+
     return sorted(list(sites))
 
 
@@ -73,7 +72,7 @@ def group_on_link_text(data):
     link_text. Return a dict, keyed on link_text, with a list of appearances
     '''
     all_data = combine_sessions(data)
-    
+
     ads_by_link={}
     for row in all_data:
         session,ad = row
@@ -83,7 +82,7 @@ def group_on_link_text(data):
                 ads_by_link[lt].append(row)
             else:
                 ads_by_link[lt] = [row]
-    
+
     return ads_by_link
 
 def print_link_text_groups(ads_by_link):
@@ -100,7 +99,7 @@ def group_on_url(data):
     Given the loaded data, group links across session, site and reload by
     url. Return a dict, keyed on url, with a list of appearances
     '''
-    
+
     ads_by_url={}
     for row in data:
         session,ad = row
@@ -111,7 +110,7 @@ def group_on_url(data):
              ads_by_url[url].append(row_data)
         else:
             ads_by_url[url] = [row_data]
-    
+
     return ads_by_url
 
 def print_url_groups(ads_by_url):
@@ -134,18 +133,18 @@ def group_matrix(data):
     1. Generate "unique" ads by linking on link_text and url
     2. match sessions to these "ads"
 
-    Leaves our resources without linktext (scripts,img, 
+    Leaves our resources without linktext (scripts,img,
     '''
-    
+
     all_data = combine_sessions(data)
 
     #dict, keyed on X, with a list of appearances (session,ad)
-    
+
     ads_by_link =  group_on_link_text(data)
     ads_by_url = group_on_url(all_data)
 
     groups = {}
-    
+
     group_id = 0
     for link_text in ads_by_link:
         # charachteristics
@@ -161,7 +160,7 @@ def group_matrix(data):
             on = a.on_site
             observations.add((session,rel,on))
             urls.add(a.url.replace(',','_'))
-        
+
         # join with other instances with the same url
         for url in urls:
             others = get_ads_with_matching_url(all_data,url)
@@ -201,7 +200,7 @@ def group_matrix(data):
     print("There are {} total groups".format(len(groups)))
     return groups
 
-def save_matrix_csv(data, groups, outfile):    
+def save_matrix_csv(data, groups, outfile):
     cols = get_all_observation_points(groups)
     with open(outfile, 'wb') as csvfile:
         writer = csv.writer(csvfile)
@@ -216,14 +215,14 @@ def save_matrix_csv(data, groups, outfile):
             csv_line = [g_id,list(link),list(urls),len(link),len(urls),sum(obs_data)]+obs_data
             writer.writerow(csv_line)
 
-        
+
 
 def group_observed(obs,cols):
     was_observed = lambda c: 1 if c in obs else 0
     return map(was_observed,cols)
 
 def get_all_observation_points(groups):
-    observ = set() 
+    observ = set()
     for g_id, g in groups.iteritems():
         character,obs = g
         for o in obs:
@@ -268,7 +267,7 @@ def print_by_site_reload(ad_lines):
         cnt =0
         for a in ads:
             print_simple_line(a,1)
-        
+
 def print_by_session(data,printer):
     for session in data:
         unit_id, treatment_id, ad_lines = data[session]
@@ -277,7 +276,7 @@ def print_by_session(data,printer):
         printer(ad_lines)
 
 def simple_print(data):
-    
+
     print("{} Sessions".format(len(data)))
     for session in data:
         unit_id, treatment_id, ad_lines = data[session]
