@@ -8,10 +8,10 @@ apt-get update
 apt-get install -y ubuntu-desktop gnome-session-flashback
 
 # Required for browsing
-apt-get install -y firefox 
+apt-get install -y firefox
 
 # Required for headless testing
-apt-get install -y xvfb 
+apt-get install -y xvfb
 
 # Required for data analysis
 apt-get install -y python-numpy python-scipy python-matplotlib
@@ -33,3 +33,6 @@ sudo pip install -r /vagrant/requirements.txt
 
 # Fetch nltk stopwords corpus
 python -m nltk.downloader -d /usr/share/nltk_data stopwords
+
+
+# pip install psutil
