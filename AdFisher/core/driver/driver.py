@@ -1,10 +1,13 @@
-import sys, os, psutil
+import sys
+import os
+import psutil
 from multiprocessing import Process
 from datetime import datetime           # for getting times for logging
 import numpy as np
 import random
-import unittest
+# import unittest
 import signal                   # for timing out external calls
+from builtins import input
 
 
 def treatments_to_string(treatment_names):
@@ -20,20 +23,24 @@ def treatments_to_string(treatment_names):
 
 
 def getRandomTable(num_agents, ntreat):
+    l_agents = np.arange(num_agents)
 
-    l = np.arange(num_agents)
-    random.shuffle(l)
+    random.shuffle(l_agents)
+
     if(num_agents % ntreat != 0):
         print("Warning: agents in each round [%s] not divisible by number of treatments [%s]"
               % (num_agents, ntreat))
         print("Assignment done randomly")
-        raw_input("Press enter to continue")
+        input("Press enter to continue")
+
     size = num_agents/ntreat
     table = [ntreat]*num_agents
+
     for i in range(0, ntreat):
-        for j in range(size*i, size*(i+1)):
-            table[l[j]] = i
-    return table, l
+        for j in range(int(size*i), int(size*(i+1))):
+            table[l_agents[j]] = i
+
+    return table, l_agents
 
 
 def run_experiment(
@@ -42,16 +49,18 @@ def run_experiment(
         num_agents,
         timeout,
         log_file="log.txt",
-        treatment_names=[]):
+        treatment_names=[]
+    ):
 
     PATH = "./" + log_file
 
     if os.path.isfile(PATH) and os.access(PATH, os.R_OK):
 
-        response = raw_input("This will overwrite file %s... Continue? (Y/n)" % log_file)
+        response = input("This will overwrite file %s... Continue? (Y/n)" % log_file)
 
         if response == 'n':
             sys.exit(0)
+
     fo = open(log_file, "w")
     fo.close()
     print("Starting Experiment")
@@ -62,10 +71,13 @@ def run_experiment(
     fo = open(log_file, "a")
     fo.write(str(datetime.now())+"||meta||agents||"+str(num_agents)+"\n")
     fo.write(str(datetime.now())+"||meta||treatnames||"+"@|".join(treatment_names)+"\n")
+    fo.close()
+
     for block_id in range(0, num_blocks):
+
         print("Block ", block_id + 1)
         table, l = getRandomTable(num_agents, ntreat)
-#       print table
+
         fo = open(log_file, "a")
         fo.write(str(datetime.now())+"||meta||block_id start||"+str(block_id)+"\n")
         fo.write(str(datetime.now())+"||meta||assignment||")
@@ -80,16 +92,21 @@ def run_experiment(
                 Process(target=drive_unit,
                         args=(
                             exper_body,
-                            block_id + 1, agent_id, table[agent_id], timeout,
-                            log_file, treatment_names
+                            block_id + 1,
+                            agent_id,
+                            table[agent_id],
+                            timeout,
+                            log_file,
+                            treatment_names
                             )
                         )
                 )
 
-        map(lambda x: x.start(), procs)
-        map(lambda x: x.join(timeout+5), procs)
+        for proc in procs:
+            proc.start()
 
         for proc in procs:
+            proc.join(timeout+5)
             if proc.is_alive():
                 kill_proc_tree(proc.pid)
 
@@ -98,7 +115,7 @@ def run_experiment(
         fo.close()
 
     print("Experiment Complete")
-#   os.system('kill %d' % os.getpid())
+    # os.system('kill %d' % os.getpid())
 
 
 class TimeoutException(Exception):

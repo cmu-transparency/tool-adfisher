@@ -3,21 +3,28 @@ import numpy as np
 from datetime import datetime                           # for getting times for computation
 
 # CV
-from sklearn import cross_validation
+# from sklearn import cross_validation
+from sklearn.model_selection import ShuffleSplit, KFold  # migrated
+# from sklearn.model_selection import train_test_split
 from itertools import product
 
 # Classification
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import ExtraTreesClassifier
 from sklearn import svm
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, RandomizedLogisticRegression
 from sklearn.svm import LinearSVC
+
+
+from builtins import input  # migrate
 
 
 # functions for Machine Learning Analyses #
 
 def split_data(X, y, splittype='timed', splitfrac=0.1, verbose=False):
     if(splittype == 'rand'):
-        rs1 = cross_validation.ShuffleSplit(len(X), n_iter=1, test_size=splitfrac)
+        # rs1 = cross_validation.ShuffleSplit(len(X), n_iter=1, test_size=splitfrac)
+        rs1 = ShuffleSplit(len(X), n_iter=1, test_size=splitfrac)
         for train, test in rs1:
             if(verbose):
                 print("Training blocks:", train)
@@ -29,7 +36,7 @@ def split_data(X, y, splittype='timed', splitfrac=0.1, verbose=False):
             print("Split at block ", str(split))
         X_train, y_train, X_test, y_test = X[:split], y[:split], X[split:], y[split:]
     else:
-        raw_input("Split type ERROR in ml.py")
+        input("Split type ERROR in ml.py")
     return X_train, y_train, X_test, y_test
 
 
@@ -99,7 +106,8 @@ def print_only_top_features(clf, feat, treatnames, feat_choice, nfeat=5):
 def print_top_features(
         X, y, feat, treatnames, clf, feat_choice, nfeat=5, blocked=1
         ):  # prints top nfeat features from clf+some numbers
-    # X_train, y_train, X_test, y_test = split_data(X, y, verbose=True) # is this wrong when rand?
+
+    X_train, y_train, X_test, y_test = split_data(X, y, verbose=True)  # is this wrong when rand?
     if blocked == 1:
         X = np.array([item for sublist in X for item in sublist])
         y = np.array([item for sublist in y for item in sublist])
@@ -142,37 +150,37 @@ def print_top_features(
             btest = btest + np.sign(X_test[i])
     n_classes = 1  # clf.feature_importances_.shape[0] # `~~~~~~~~~~
 
-#   feature_scores = clf.feature_importances_
+    #   feature_scores = clf.feature_importances_
     feature_scores = clf.coef_[0]
     print(
-        feature_scores.shape,          # `~~~~~~~~~~)
+        feature_scores.shape,  # `~~~~~~~~~~)
         np.count_nonzero(feature_scores)
     )
-#   raw_input("wait")
+    #   raw_input("wait")
     if n_classes == 1:         # `~~~~~~~~~~
-        topk1 = np.argsort(feature_scores)[::-1][:nfeat]            # `~~~~~~~~~~
+        topk1 = np.argsort(feature_scores)[::-1][:nfeat]  # `~~~~~~~~~~
         print("\nFeatures for treatment %s:" % (str(treatnames[1])))
         for i in topk1:
             if(feat_choice == 'ads'):
                 feat.choose_by_index(i).printStuff(
-                    feature_scores[i],              # `~~~~~~~~~~
+                    feature_scores[i],                   # `~~~~~~~~~~
                     [Atrain[i], Btrain[i], Atest[i], Btest[i],
                      A[i], B[i]], [atrain[i], btrain[i], atest[i], btest[i], a[i], b[i]])
             elif(feat_choice == 'words'):
                 print(feat[i])
-        topk0 = np.argsort(feature_scores)[:nfeat]  # `~~~~~~~~~~
+        topk0 = np.argsort(feature_scores)[:nfeat]       # `~~~~~~~~~~
         print("\n\nFeatures for treatment %s:" % (str(treatnames[0])))
         for i in topk0:
             if(feat_choice == 'ads'):
                 feat.choose_by_index(i).printStuff(
-                    feature_scores[i],              # `~~~~~~~~~~
+                    feature_scores[i],                   # `~~~~~~~~~~
                     [Atrain[i], Btrain[i], Atest[i], Btest[i], A[i], B[i]],
                     [atrain[i], btrain[i], atest[i], btest[i], a[i], b[i]])
             elif(feat_choice == 'words'):
                 print(feat[i])
     else:
         for i in range(0, n_classes):
-            topk = np.argsort(feature_scores[i])[::-1][:nfeat]          # `~~~~~~~~~~
+            topk = np.argsort(feature_scores[i])[::-1][:nfeat]  # `~~~~~~~~~~
             print("Features for treatment %s:" % (str(treatnames[i])))
             for j in topk:
                 if feat_choice == 'ads':
@@ -186,65 +194,91 @@ def print_top_features(
     return topk0, topk1
 
 
-def crossVal_algo(
-        k, algo, params,
-        X, y, splittype, splitfrac, verbose=False
-        ):  # performs cross_validation
+def crossVal_algo(k, algo, params, X, y,
+                  splittype,
+                  splitfrac,
+                  verbose=False):
+    # performs cross_validation
+
     if splittype == 'rand':
-        rs2 = cross_validation.ShuffleSplit(len(X), n_iter=k, test_size=splitfrac)
+
+        # rs2 = cross_validation.ShuffleSplit(len(X), n_iter=k, test_size=splitfrac)
+        rs2 = ShuffleSplit(n_splits=k, test_size=splitfrac)  # migrate
+
     elif splittype == 'timed':
-        rs2 = cross_validation.KFold(n=len(X), n_folds=k)
+
+        # rs2 = cross_validation.KFold(n=len(X), n_folds=k)
+        rs2 = KFold(n_splits=k)  # migrate
+
     max, max_params = 0, {}
     par = []
+
     for param in params.keys():
         par.append(params[param])
+
     for p in product(*par):
+
+        pkeys = list(params.keys())
+        # migrated params.keys() => list(param.keys()) => pkeys
+
         if(verbose):
             print("val=", p)
         score = 0.0
-        for train, test in rs2:
+
+        for train, test in rs2.split(X):  # migrate
+
             X_train, y_train, X_test, y_test = X[train], y[train], X[test], y[test]
             X_train = np.array([item for sublist in X_train for item in sublist])
             y_train = np.array([item for sublist in y_train for item in sublist])
             X_test = np.array([item for sublist in X_test for item in sublist])
             y_test = np.array([item for sublist in y_test for item in sublist])
+
             # print(X_train.shape, y_train.shape, X_test.shape, y_test.shape)
             if algo == 'svc':
                 clf = LinearSVC(
-                    C=p[params.keys().index('C')],
+                    C=p[pkeys.index('C')],
                     penalty="l1", dual=False)  # Larger C increases model complexity
+
             if algo == 'kNN':
                 clf = KNeighborsClassifier(
-                    n_neighbors=p[params.keys().index('k')],
-                    warn_on_equidistant=False, p=p[params.keys().index('p')])
+                    n_neighbors=p[pkeys.index('k')],
+                    warn_on_equidistant=False, p=p[pkeys.index('p')])
+
             if algo == 'linearSVM':
                 clf = svm.SVC(
                     kernel='linear',
-                    C=p[params.keys().index('C')])
+                    C=p[pkeys.index('C')])
+
             if algo == 'polySVM':
                 clf = svm.SVC(
-                    kernel='poly', degree=p[params.keys().index('degree')],
-                    C=p[params.keys().index('C')])
+                    kernel='poly', degree=p[pkeys.index('degree')],
+                    C=p[pkeys.index('C')])
+
             if algo == 'rbfSVM':
                 clf = svm.SVC(
-                    kernel='rbf', gamma=p[params.keys().index('gamma')],
-                    C=p[params.keys().index('C')])
+                    kernel='rbf', gamma=p[pkeys.index('gamma')],  # migrated
+                    C=p[pkeys.index('C')])
                 # a smaller gamma gives a decision boundary with a smoother curvature
+
             if algo == 'logit':
                 clf = LogisticRegression(
-                    penalty=p[params.keys().index('penalty')], dual=False,
-                    C=p[params.keys().index('C')])
+                    solver='liblinear',
+                    penalty=p[pkeys.index('penalty')], dual=False,  # migrated
+                    C=p[pkeys.index('C')])  # migrated
+
             if algo == 'tree':
                 clf = ExtraTreesClassifier(
-                    n_estimators=p[params.keys().index('ne')],
+                    n_estimators=p[pkeys.index('ne')],  # migrated
                     compute_importances=True, random_state=0
                 )
+
             if algo == 'randlog':
                 clf = RandomizedLogisticRegression(
-                    C=p[params.keys().index('C')]
+                    C=p[pkeys.index('C')]
                 )
 
             clf.fit(X_train, y_train)
+
             score += clf.score(X_test, y_test)
 
         score /= k
@@ -259,18 +293,21 @@ def crossVal_algo(
     return max, max_params, classifier
 
 
-def train_and_test(X, y, splittype='timed', splitfrac=0.1, nfolds=10,
-        verbose=False):
+def train_and_test(X, y,
+                   splittype='timed',
+                   splitfrac=0.1,
+                   nfolds=10,
+                   verbose=False):
 
     algos = {
         'logit': {'C': np.logspace(-5.0, 15.0, num=21, base=2), 'penalty': ['l2']},
-        #               'svc':{'C':np.logspace(-5.0, 15.0, num=21, base=2)}
-        #               'kNN':{'k':np.arange(1,20,2), 'p':[1,2,3]},
-        #               'polySVM':{'C':np.logspace(-5.0, 15.0, num=21, base=2), 'degree':[1,2,3,4]},
-        #               'rbfSVM':{'C':np.logspace(-5.0, 15.0, num=21, base=2), 'gamma':np.logspace(-15.0, 3.0, num=19, base=2)},
-        #               'randlog':{'C':np.logspace(-5.0, 15.0, num=21, base=2)},
-        #               'tree':{'ne':np.arange(5,10,2)}
-        }
+        # 'svc':{'C':np.logspace(-5.0, 15.0, num=21, base=2)}
+        # 'kNN':{'k':np.arange(1,20,2), 'p':[1,2,3]},
+        # 'polySVM':{'C':np.logspace(-5.0, 15.0, num=21, base=2), 'degree':[1,2,3,4]},
+        # 'rbfSVM':{'C':np.logspace(-5.0, 15.0, num=21, base=2), 'gamma':np.logspace(-15.0, 3.0, num=19, base=2)},
+        # 'randlog':{'C':np.logspace(-5.0, 15.0, num=21, base=2)},
+        # 'tree':{'ne':np.arange(5,10,2)}
+    }
     X_train, y_train, X_test, y_test = split_data(X, y, splittype, splitfrac, verbose)
     if(verbose):
         print("Training Set size: ", len(y_train), "blocks")

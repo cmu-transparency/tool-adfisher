@@ -1,12 +1,13 @@
 import unittest
-import web.pre_experiment.alexa as alexa
+# import web.pre_experiment.alexa as alexa
 import driver.driver as driver
 import analysis.permutation_test
 import analysis.statistics
 import analysis.ml
 import sys
-import os
+# import os
 
+from builtins import input
 
 def do_experiment(
         make_unit,
@@ -73,6 +74,7 @@ def do_experiment(
     """
 
     def exper_body(unit_id, treatment_id):
+
         class Test(unittest.TestCase):
 
             def setUp(self):
@@ -98,27 +100,32 @@ def do_experiment(
         unittest.TextTestRunner(verbosity=1).run(suite)
 
     ntreat = len(treatments)
+
     if len(treatment_names) != ntreat:
 
         treatment_names = map(lambda i: str(i), range(0, ntreat))
 
-    if(exp_flag):
+    if exp_flag:
+
         driver.run_experiment(
             exper_body,
-            num_blocks, num_units, timeout,
-            log_file, treatment_names
+            num_blocks,
+            num_units,
+            timeout,
+            log_file,
+            treatment_names
         )
 
-    if(analysis_flag):
+    if analysis_flag:
+
         result = load_results()
+
         if len(result) == 3:
             X, y, features = result[0], result[1], result[2]
         elif len(result) == 2:
             X, y = result[0], result[1]
         else:
-            raw_input(
-                "Could not resolve return result from load_results(). Press Enter to exit"
-            )
+            input("Could not resolve return result from load_results(). Press Enter to exit")
             sys.exit(0)
 
         analysis.statistics.print_counts(X, y)
