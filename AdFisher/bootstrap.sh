@@ -1,17 +1,19 @@
 #!/bin/bash
 
-
 ### Install os dependencies
 apt-get update
+apt-get upgrade
+apt-get dist-upgrade
 
 # Install gui
-apt-get install -y ubuntu-desktop gnome-session-flashback
+apt-get install -y lightdm unity x11-xserver-utils
+apt-get install -y --no-install-recommends ubuntu-desktop
 
 # Required for browsing
 apt-get install -y firefox
 
 # Required for headless testing
-apt-get install -y xvfb
+# apt-get install xvfb
 
 # Required for data analysis
 apt-get install -y python3-numpy python3-scipy python3-matplotlib
@@ -20,17 +22,20 @@ apt-get install -y python3-numpy python3-scipy python3-matplotlib
 apt-get install -y python3-pip python3-dev
 
 # Required for pyre2 dependencies
-apt-get install -y git build-essential
-cd ~
-git clone https://code.googlesource.com/re2
-cd re2
-make test
-sudo make install
+apt-get install -y libre2-dev
+# apt-get install -y libre2-1v5
+#apt-get install -y git build-essential
+#cd ~
+#git clone https://code.googlesource.com/re2
+#cd re2
+#make test
+#sudo make install
 
 ### Install python dependencies
-sudo pip3 install -r /vagrant/requirements.txt
-sudo pip3 install --upgrade urllib3
-sudo pip3 install --upgrade psutil
+# pip3 install --upgrade pip
+pip3 install -r /vagrant/requirements.txt
+pip3 install --upgrade urllib3
+pip3 install --upgrade psutil
 
 # Fetch nltk stopwords corpus
 python3 -m nltk.downloader -d /usr/share/nltk_data stopwords
@@ -39,4 +44,4 @@ python3 -m nltk.downloader -d /usr/share/nltk_data stopwords
 wget -q https://github.com/mozilla/geckodriver/releases/download/v0.23.0/geckodriver-v0.23.0-linux64.tar.gz
 tar -xvzf geckodriver*
 chmod +x geckodriver
-sudo mv geckodriver* /usr/local/bin
+mv geckodriver* /usr/local/bin
