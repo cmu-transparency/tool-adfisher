@@ -29,6 +29,8 @@ sudo make install
 
 ### Install python dependencies
 sudo pip3 install -r /vagrant/requirements.txt
+sudo pip3 install --upgrade urllib3
+sudo pip3 install --upgrade psutil
 
 # Fetch nltk stopwords corpus
 python3 -m nltk.downloader -d /usr/share/nltk_data stopwords
