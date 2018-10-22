@@ -3,6 +3,9 @@ AdFisher
 
 AdFisher is a tool for running Automated Experiments on Personalized Ad Settings.
 
+**If you are using this tool as part of a homework for ECE 18-734, follow the installation
+instructions from the homework instead of those described here.**
+
 Requirements
 
 -----------
@@ -78,13 +81,12 @@ This repository can be used with [Vagrant](https://www.vagrantup.com/) to quickl
 machine with all the necessary dependencies described above installed. This can be useful for
 development and testing experiments.
 
-1. git clone https://github.com/tadatitam/info-flow-experiments
+1. git clone https://github.com/cmu-transparency/tool-adfisher
 
 2. vagrant up
 
-This defaults to an Ubuntu Server 14.04 LTS (Trusty Tahr) build and will have the AdFisher source
-directory synced to /vagrant on the virtual machine. You can SSH into this machine with `vagrant
-ssh`.
+This defaults to an Ubuntu (Xenial) build and will have the AdFisher source directory synced to
+/vagrant on the virtual machine. You can SSH into this machine with `vagrant ssh`.
 
 Troubleshooting
 
