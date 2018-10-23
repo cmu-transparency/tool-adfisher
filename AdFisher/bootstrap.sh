@@ -5,15 +5,16 @@ apt-get update
 apt-get upgrade
 apt-get dist-upgrade
 
-# Install gui
-apt-get install -y lightdm unity x11-xserver-utils
+### Install gui
+apt-get install -y lightdm unity
 apt-get install -y --no-install-recommends ubuntu-desktop
+#apt-get install -y ubuntu-desktop
+
+# Alternatively, without gui, install xvfp for headless testing
+#apt-get install xvfb
 
 # Required for browsing
 apt-get install -y firefox
-
-# Required for headless testing
-# apt-get install xvfb
 
 # Required for data analysis
 apt-get install -y python3-numpy python3-scipy python3-matplotlib
@@ -24,12 +25,12 @@ apt-get install -y python3-pip python3-dev
 # Required for pyre2 dependencies
 apt-get install -y libre2-dev
 # apt-get install -y libre2-1v5
-#apt-get install -y git build-essential
-#cd ~
-#git clone https://code.googlesource.com/re2
-#cd re2
-#make test
-#sudo make install
+# apt-get install -y git build-essential
+# cd ~
+# git clone https://code.googlesource.com/re2
+# cd re2
+# make test
+# sudo make install
 
 ### Install python dependencies
 # pip3 install --upgrade pip

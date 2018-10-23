@@ -4,12 +4,13 @@
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
 
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   #config.ssh.forward_x11 = true
   #config.ssh.forward_agent = true
 
   # Official Ubuntu Server 14.04 LTS (Trusty Tahr) builds
-  # config.vm.box = "minimal/xenial64"
+  # config.vm.box = "minimal/xenial64" # reload step fails for this one
   config.vm.box = "ubuntu/xenial64"
 
   # Provision with AdFisher dependencies
