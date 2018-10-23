@@ -6,8 +6,10 @@ VAGRANTFILE_API_VERSION = "2"
 
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  #config.ssh.forward_x11 = true
-  #config.ssh.forward_agent = true
+  # config.ssh.forward_x11 = true
+  # config.ssh.forward_agent = true
+
+  # config.ssh.extra_args = "export DISPLAY=:0"
 
   # Official Ubuntu Server 14.04 LTS (Trusty Tahr) builds
   # config.vm.box = "minimal/xenial64" # reload step fails for this one

@@ -144,6 +144,10 @@ def get_feature_vectors(
         feat_choice,
         filtered_by=None
         ):
+
+    # print(advdicts)
+    # print(feat_choice)
+
     # returns observation vector from a list of rounds
     n = len(advdicts[0]['assignment'])
     list = []
@@ -236,12 +240,13 @@ def interpret_log_line(line):
 
 def read_log(log_file):
     par_adv = []
+
     measured = False  # warning: assigned but never used
     sys.stdout.write("Reading log")
 
     fo = open(log_file, "r")
-    for line in fo:
 
+    for line in fo:
         tim, linetype, linename, value, unit_id, treatment_id = interpret_log_line(line)
 
         if linetype == 'meta':
@@ -256,7 +261,7 @@ def read_log(log_file):
             elif(linename == 'block_id start'):
                 sys.stdout.write(".")
                 sys.stdout.flush()
-                block_id = int(value) # warning: assigned but never used
+                block_id = int(value)  # warning: assigned but never used
                 adv = []
                 ints = []
                 newsv = []
@@ -264,7 +269,7 @@ def read_log(log_file):
                     adv.append(adVector.AdVector())
                     ints.append(interest.Interests())
                     newsv.append(news.NewsVector())
-#               print block_id
+                print(block_id)
 
             elif(linename == 'assignment'):
                 assignment = [int(x) for x in re.split("\@\|", value)]
@@ -277,6 +282,7 @@ def read_log(log_file):
                 )
 
         elif linetype == 'treatment':
+            # print("treatment")
             pass
 
         elif linetype == 'measurement':
@@ -293,13 +299,17 @@ def read_log(log_file):
                 newsv[int(unit_id)].add(ind_news)
 
         elif linetype == 'error':
-            # print("Error in block", block_id, ": ", line.strip())
+            print("Error in block", block_id, ": ", line.strip())
             pass
 
     sys.stdout.write(".Reading complete\n")
     print("Treatments: ", treatnames)
 
     fo.close()
+
+    if len(par_adv) == 0:
+        print("problem: did not get any measurements from the logs")
+
     return par_adv, treatnames
 
 

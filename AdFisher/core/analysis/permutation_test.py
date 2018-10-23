@@ -52,12 +52,18 @@ def get_perm(ylabel):
 
     blocks = ylabel.shape[0]
     yret = np.copy(ylabel)
-    for i in range(0,blocks):
+
+    for i in range(0, blocks):
         random.shuffle(yret[i])
     return yret
 
+
 def blocked_sampled_test(
-        observed_values, unit_assignments, test_stat, alpha=0.01, iterations=10000
+        observed_values,
+        unit_assignments,
+        test_stat,
+        alpha=0.01,
+        iterations=10000
 ):
     """Run a block permutation test."""
 
@@ -65,7 +71,8 @@ def blocked_sampled_test(
     Tobs = test_stat(observed_values, unit_assignments)
     print('Tobs: ', Tobs)
     under = 0
-    for i in range(0,iterations):
+
+    for i in range(0, iterations):
         permuted_assignments = get_perm(unit_assignments)
         Tpi = test_stat(observed_values, permuted_assignments)
         if round(Tobs, 10) <= round(Tpi, 10):
@@ -97,10 +104,13 @@ def proportion_confint(count, nobs, alpha=0.05, method='normal'):
         # possible problems if bounds are too narrow
         # problem if we hit 0 or 1
         #    brentq fails ValueError: f(a) and f(b) must have different signs
+
         ci_low = optimize.brentq(func, q_ * 0.1, q_)
+
         # ci_low = stats.binom_test(qi_low * nobs, nobs, p=q_)
         # ci_low = np.floor(qi_low * nobs) / nobs
         ub = np.minimum(q_ + 2 * (q_ - ci_low), 1)
+
         ci_upp = optimize.brentq(func, q_, ub)
         # ci_upp = stats.binom_test(qi_upp * nobs, nobs, p=q_)
         # ci_upp = np.ceil(qi_upp * nobs) / nobs

@@ -22,6 +22,7 @@ from builtins import input  # migrate
 # functions for Machine Learning Analyses #
 
 def split_data(X, y, splittype='timed', splitfrac=0.1, verbose=False):
+
     if(splittype == 'rand'):
         # rs1 = cross_validation.ShuffleSplit(len(X), n_iter=1, test_size=splitfrac)
         rs1 = ShuffleSplit(len(X), n_iter=1, test_size=splitfrac)
@@ -30,24 +31,28 @@ def split_data(X, y, splittype='timed', splitfrac=0.1, verbose=False):
                 print("Training blocks:", train)
                 print("Test blocks:", test)
             X_train, y_train, X_test, y_test = X[train], y[train], X[test], y[test]
+
     elif(splittype == 'timed'):
         split = int((1.-splitfrac)*len(X))
         if(verbose):
             print("Split at block ", str(split))
         X_train, y_train, X_test, y_test = X[:split], y[:split], X[split:], y[split:]
+
     else:
         input("Split type ERROR in ml.py")
+
     return X_train, y_train, X_test, y_test
 
 
 def select_and_fit_classifier(nfolds, algos, X_train, y_train, splittype, splitfrac, verbose):
+
     max_score = 0
     for algo in algos.keys():
         score, mPar, clf = crossVal_algo(
             nfolds, algo, algos[algo], X_train, y_train, splittype, splitfrac
         )
-#       if(verbose):
-#           print(score, mPar)
+        # if(verbose):
+        #    print(score, mPar)
         if(score > max_score):
             max_clf = clf
             max_score = score
@@ -225,6 +230,11 @@ def crossVal_algo(k, algo, params, X, y,
             print("val=", p)
         score = 0.0
 
+        if len(X) < k:
+            print("There are insufficient number of samples to do a train/test split.")
+            print("Number if samples is", len(X), "while the number of splits is", k, ".")
+            raise Exception("Insufficient samples.")
+
         for train, test in rs2.split(X):  # migrate
 
             X_train, y_train, X_test, y_test = X[train], y[train], X[test], y[test]
@@ -295,23 +305,31 @@ def crossVal_algo(k, algo, params, X, y,
 
 def train_and_test(X, y,
                    splittype='timed',
-                   splitfrac=0.1,
+                   splitfrac=0.2,
                    nfolds=10,
                    verbose=False):
 
+    print(len(X))
+
     algos = {
         'logit': {'C': np.logspace(-5.0, 15.0, num=21, base=2), 'penalty': ['l2']},
+
         # 'svc':{'C':np.logspace(-5.0, 15.0, num=21, base=2)}
         # 'kNN':{'k':np.arange(1,20,2), 'p':[1,2,3]},
         # 'polySVM':{'C':np.logspace(-5.0, 15.0, num=21, base=2), 'degree':[1,2,3,4]},
-        # 'rbfSVM':{'C':np.logspace(-5.0, 15.0, num=21, base=2), 'gamma':np.logspace(-15.0, 3.0, num=19, base=2)},
+        # 'rbfSVM':{'C':np.logspace(-5.0, 15.0, num=21, base=2),
+        #           'gamma':np.logspace(-15.0, 3.0, num=19, base=2)},
         # 'randlog':{'C':np.logspace(-5.0, 15.0, num=21, base=2)},
         # 'tree':{'ne':np.arange(5,10,2)}
+
     }
+
     X_train, y_train, X_test, y_test = split_data(X, y, splittype, splitfrac, verbose)
+
     if(verbose):
         print("Training Set size: ", len(y_train), "blocks")
         print("Testing Set size: ", len(y_test), "blocks")
+
     s = datetime.now()
     clf, CVscore = select_and_fit_classifier(
         nfolds, algos, X_train, y_train, splittype, splitfrac, verbose
@@ -325,6 +343,8 @@ def train_and_test(X, y,
     blockSize = X_test.shape[1]
     blocks = X_test.shape[0]
     ypred = np.array([[-1]*blockSize]*blocks)
+
     for i in range(0, blocks):
         ypred[i] = clf.predict(X_test[i])
+
     return clf, ypred, y_test

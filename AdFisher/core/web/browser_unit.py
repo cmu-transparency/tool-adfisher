@@ -9,13 +9,50 @@ from datetime import datetime   # for tagging log with datetime
 # from xvfbwrapper import Xvfb                 # for creating artificial display to run experiments
 # from selenium.webdriver.common.proxy import *  # for proxy settings
 from selenium.webdriver.common.proxy import Proxy, ProxyType
+from html.parser import HTMLParser
+
+
+class MLStripper(HTMLParser):
+    def __init__(self):
+        HTMLParser.__init__(self)
+
+        self.reset()
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def get_data(self):
+        return ''.join(self.fed)
+
+
+def strip_tags(html):
+    s = MLStripper()
+    s.feed(html)
+    return s.get_data()
+
+
+class FormException(Exception):
+
+    def __init__(self, unit, site, msg):
+        Exception.__init__(self, unit, msg)
+
+        self.unit = unit
+        self.site = site
+        self.msg = msg
+
+    def __str__(self):
+        return ("The website %s did not contain the expected elements. It is likely that %s is outdated and needs to be updated to reflect changes in website formatting. %s" % (str(self.site), str(self.unit.__class__.__name__), str(self.msg)))
 
 
 class BrowserUnit:
 
     def __init__(self, browser, log_file, unit_id, treatment_id, headless=False, proxy=None):
+
         self.headless = headless
+
         if(headless):
+
             from xvfbwrapper import Xvfb
             self.vdisplay = Xvfb(width=1280, height=720)
             self.vdisplay.start()
@@ -49,12 +86,14 @@ class BrowserUnit:
                 self.driver = webdriver.Firefox(proxy=sproxy)
 
             else:
-                print("Unidentified Platform")
+                self.print("Unidentified Platform")
                 sys.exit(0)
+
+            self.driver.implicitly_wait(20)
 
         elif browser == 'chrome':
 
-            print("Expecting chromedriver at path specified in core/web/browser_unit")
+            self.print("Expecting chromedriver at path specified in core/web/browser_unit")
 
             if platform.system() == 'Darwin':
                 chromedriver = "../core/web/chromedriver/chromedriver_mac"
@@ -63,7 +102,7 @@ class BrowserUnit:
                 chromedriver = "../core/web/chromedriver/chromedriver_linux"
 
             else:
-                print("Unidentified Platform")
+                self.print("Unidentified Platform")
                 sys.exit(0)
 
             os.environ["webdriver.chrome.driver"] = chromedriver
@@ -75,8 +114,9 @@ class BrowserUnit:
             )
 
         else:
-            print("Unsupported Browser")
+            self.print("Unsupported Browser")
             sys.exit(0)
+
         self.base_url = "https://www.google.com/"
         self.verificationErrors = []
         self.driver.set_page_load_timeout(40)
@@ -88,18 +128,23 @@ class BrowserUnit:
     def quit(self):
         if(self.headless):
             self.vdisplay.stop()
+
         self.driver.quit()
 
     def wait(self, seconds):
         time.sleep(seconds)
+
+    def print(self, *kargs):
+        print("unit %d (treatment %d):\t" % (self.unit_id, self.treatment_id), *kargs)
 
     def log(self, linetype, linename, msg):
         # linetype = ['treatment', 'measurement', 'event', 'error', 'meta']
         """Maintains a log of visitations"""
         fo = open(self.log_file, "a")
         fo.write(
-            str(datetime.now())+"||"+linetype+"||"+linename+"||"+str(msg)+"||"+\
-            str(self.unit_id)+"||"+str(self.treatment_id) + '\n')
+            str(datetime.now()) + "||" + linetype + "||" + linename + "||" + str(msg) + "||" + \
+            str(self.unit_id) + "||" + str(self.treatment_id) + '\n'
+        )
         fo.close()
 
     def interpret_log_line(self, line):
@@ -133,7 +178,9 @@ class BrowserUnit:
             tim, linetype, linename, value, unit_id, treatment_id = self.interpret_log_line(line)
             if(linename == 'block_id start'):
                 round = int(value)
+
 #       print("round, instances: ", round, instances)
+
         fo.close()
         clear = False
         count = 0
@@ -169,7 +216,6 @@ class BrowserUnit:
 
             fo.close()
             clear = True
-#           print(c)
 
             for i in range(0, instances):
                 if c[i] == 0:
@@ -183,13 +229,16 @@ class BrowserUnit:
         for line in fo:
             chunks = re.split("\|\|", line)
             site = "http://"+chunks[0].strip()
+            self.print("heading over to: ", site)
             try:
                 self.driver.set_page_load_timeout(40)
                 self.driver.get(site)
                 time.sleep(delay)
                 self.log('treatment', 'visit website', site)
+
                 # pref = get_ad_pref(self.driver)
                 # self.log("pref"+"||"+str(treatment_id)+"||"+"@".join(pref), self.unit_id)
+
             except Exception:
                 self.log('error', 'website timeout', site)
 
@@ -211,3 +260,8 @@ class BrowserUnit:
                     fo.close()
                     count += 1
             self.driver.find_element_by_css_selector("a.next").click()
+
+    def fail_format(self, e):
+        raise FormException(unit=self,
+                            site=self.driver.current_url,
+                            msg=e)

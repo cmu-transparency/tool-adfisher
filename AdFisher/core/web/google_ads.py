@@ -7,25 +7,7 @@ from datetime import datetime                                    # for tagging l
 # from selenium.webdriver.common.action_chains import ActionChains # to move mouse over
 # import browser_unit
 from . import google_search             # interacting with Google Search
-from html.parser import HTMLParser
-
-
-class MLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.fed = []
-
-    def handle_data(self, d):
-        self.fed.append(d)
-
-    def get_data(self):
-        return ''.join(self.fed)
-
-
-def strip_tags(html):
-    s = MLStripper()
-    s.feed(html)
-    return s.get_data()
+from .browser_unit import strip_tags
 
 
 class GoogleAdsUnit(google_search.GoogleSearchUnit):
@@ -50,6 +32,7 @@ class GoogleAdsUnit(google_search.GoogleSearchUnit):
 
         while (rel < reloads):  # number of reloads on sites to capture all ads
             time.sleep(delay)
+
             try:
                 s = datetime.now()
 

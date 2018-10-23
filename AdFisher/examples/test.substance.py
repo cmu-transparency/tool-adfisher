@@ -8,7 +8,7 @@ import converter.reader             # read log and create feature vectors
 import analysis.statistics          # statistics for significance testing
 
 log_file = 'log.substance.txt'
-site_file = 'substance.txt'
+site_file = 'sites.txt'
 
 
 def make_browser(unit_id, treatment_id):

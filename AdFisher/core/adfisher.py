@@ -10,14 +10,17 @@ import sys
 from builtins import input
 
 
+def do_nothing(*argk, **argkw): pass
+
+
 def do_experiment(
-        make_unit,
-        treatments,
-        measurement,
-        end_unit,
-        load_results,
-        test_stat,
-        ml_analysis,
+        make_unit=do_nothing,
+        treatments=[],
+        measurement=do_nothing,
+        end_unit=do_nothing,
+        load_results=do_nothing,
+        test_stat=do_nothing,
+        ml_analysis=False,
         num_blocks=1,
         num_units=2,
         timeout=2000,
@@ -122,6 +125,8 @@ def do_experiment(
     if analysis_flag:
 
         result = load_results()
+
+        # print(result)
 
         if len(result) == 3:
             X, y, features = result[0], result[1], result[2]  # warning: features not used
