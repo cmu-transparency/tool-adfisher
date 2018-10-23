@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(0, "../core")       # files from the core
+sys.path.insert(0, "../core")       # files from the core # noqa: E402
+
 import adfisher                     # adfisher wrapper function
 import converter.reader             # read log and create feature vectors
 import analysis.statistics          # statistics for significance testing

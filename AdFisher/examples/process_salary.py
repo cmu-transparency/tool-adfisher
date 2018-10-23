@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 import numpy
 
@@ -26,17 +27,17 @@ for line in sys.stdin:
                     else:
                         t2[sal] = 1
                     l2.append(sal)
-    except:
+    except Exception:
         pass
 
-print ""
-print "Controlled Summary (0): "
-print t1
-print "Mean: " + str(numpy.mean(numpy.array(l1).astype(numpy.float)))
-print "Standard Dev: " + str(numpy.std(numpy.array(l1).astype(numpy.float)))
-print ""
-print "Experimental Summary (1): "
-print t2
-print "Mean: " + str(numpy.mean(numpy.array(l2).astype(numpy.float)))
-print "Standard Dev: " + str(numpy.std(numpy.array(l2).astype(numpy.float)))
-print ""
+print("")
+print("Controlled Summary (0): ")
+print(t1)
+print("Mean: " + str(numpy.mean(numpy.array(l1).astype(numpy.float))))
+print("Standard Dev: " + str(numpy.std(numpy.array(l1).astype(numpy.float))))
+print("")
+print("Experimental Summary (1): ")
+print(t2)
+print("Mean: " + str(numpy.mean(numpy.array(l2).astype(numpy.float))))
+print("Standard Dev: " + str(numpy.std(numpy.array(l2).astype(numpy.float))))
+print("")

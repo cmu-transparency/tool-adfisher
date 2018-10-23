@@ -1,11 +1,12 @@
 import sys
 # import os
-sys.path.insert(0, "../core")       # files from the core
+sys.path.insert(0, "../core")       # files from the core # noqa: E402
+
 import adfisher                     # adfisher wrapper function
 import web.pre_experiment.alexa     # collecting top sites from alexa
 import web.google_news              # interacting with Google News
-import converter.reader             # read log and create feature vectors
-import analysis.statistics          # statistics for significance testing
+# import converter.reader             # read log and create feature vectors
+# import analysis.statistics          # statistics for significance testing
 
 log_file = 'log.demo.txt'
 site_file = 'demo.txt'
