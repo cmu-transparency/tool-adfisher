@@ -5,6 +5,7 @@ sys.path.insert(0, "../core")       # files from the core # noqa: E402
 import adfisher                     # adfisher wrapper function
 import web.pre_experiment.alexa     # collecting top sites from alexa
 import web.google_ads               # collecting ads
+import web.browser_unit as browser
 
 log_file = 'orig.adblock.log.txt'
 
@@ -15,7 +16,7 @@ def make_browser(unit_id, treatment_id):
         log_file=log_file,
         unit_id=unit_id,
         treatment_id=treatment_id,
-        headless=True,
+        headless=browser.CONFIGURED_FOR_HEADLESS,
         browser="firefox"
     )
     return b

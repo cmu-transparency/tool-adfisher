@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 # import web.pre_experiment.alexa as alexa
 import driver.driver as driver
@@ -5,7 +6,7 @@ import analysis.permutation_test
 import analysis.statistics
 import analysis.ml
 import sys
-# import os
+import os
 
 from builtins import input
 
@@ -79,6 +80,9 @@ def do_experiment(
 
     """
 
+    if "DISPLAY" not in os.environ:
+        print("WARNING: DISPLAY not set, can only run in headless mode")
+
     def exper_body(unit_id, treatment_id):
 
         class Test(unittest.TestCase):
@@ -125,8 +129,6 @@ def do_experiment(
     if analysis_flag:
 
         result = load_results()
-
-        # print(result)
 
         if len(result) == 3:
             X, y, features = result[0], result[1], result[2]  # warning: features not used

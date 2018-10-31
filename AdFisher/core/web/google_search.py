@@ -1,3 +1,4 @@
+from __future__ import print_function
 import time
 import sys                      # some prints
 from datetime import datetime                    # for tagging log with datetime

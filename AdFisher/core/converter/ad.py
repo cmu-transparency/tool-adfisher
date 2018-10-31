@@ -1,3 +1,4 @@
+from __future__ import print_function
 import re                                       # regular expressions
 from stemming.porter2 import stem               # for Porter Stemming
 from . import common

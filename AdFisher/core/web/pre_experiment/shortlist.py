@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest, time								# unittest starts of the testing environment for browsers, time.sleep
 import os, platform									# for running  os, platform specific function calls
 import sys											# sys.argv
@@ -7,7 +8,7 @@ from datetime import datetime						# for tagging log with datetime
 from selenium import webdriver						# for running the driver on websites
 from selenium.webdriver.common.proxy import *		# for proxy settings
 
-from xvfbwrapper import Xvfb						# for creating artificial display buffers to run experiments				
+from xvfbwrapper import Xvfb						# for creating artificial display buffers to run experiments
 import helper as cole								# functions from collectHelper
 
 import signal										# for timing out external calls
@@ -24,8 +25,8 @@ proxy = Proxy({
     'noProxy': '' # set this value as desired
     })
 
-class TimeoutException(Exception): 
-    pass 
+class TimeoutException(Exception):
+    pass
 
 class Webdriver(unittest.TestCase):
 	def setUp(self):
@@ -67,7 +68,7 @@ class Webdriver(unittest.TestCase):
 		self.verificationErrors = []
 		self.driver.set_page_load_timeout(40)
 		self.accept_next_alert = True
-	
+
 	def test_webdriver(self):
 		driver = self.driver
 		cole.optIn(driver)
@@ -91,16 +92,16 @@ def shortlist_sites(site, target_file, browser='firefox', timeout=100):
 	BROWSER = browser
 	SITE = site
 	TARGET_FILE = target_file
-	
+
 	def signal_handler(signum, frame):
 		print "Timeout!"
 # 		fo = open(LOG_FILE, "a")
 # 		fo.write(str(datetime.now())+"||TimedOut||"+str(TREATMENTID)+"||"+str(ID)+"\n")
 # 		fo.close()
 		raise TimeoutException("Timed out!")
-		
-# 	timeout = 10	
-	
+
+# 	timeout = 10
+
 	old_handler = signal.signal(signal.SIGALRM, signal_handler)
 	signal.alarm(timeout)   # 2000 seconds
 	try:
@@ -111,6 +112,5 @@ def shortlist_sites(site, target_file, browser='firefox', timeout=100):
 	finally:
 		print "Shortlist process exiting!"
 		signal.signal(signal.SIGALRM, old_handler)
-	
-	signal.alarm(0)
 
+	signal.alarm(0)

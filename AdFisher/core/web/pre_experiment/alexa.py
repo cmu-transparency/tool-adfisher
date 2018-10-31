@@ -1,3 +1,4 @@
+from __future__ import print_function
 import unittest
 import time       # unittest starts of the testing environment for browsers, time.sleep
 import os

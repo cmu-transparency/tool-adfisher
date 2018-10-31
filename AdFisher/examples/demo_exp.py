@@ -5,6 +5,7 @@ sys.path.insert(0, "../core")       # files from the core # noqa: E402
 import adfisher                     # adfisher wrapper function
 import web.pre_experiment.alexa     # collecting top sites from alexa
 import web.google_news              # interacting with Google News
+import web.browser_unit as browser
 # import converter.reader             # read log and create feature vectors
 # import analysis.statistics          # statistics for significance testing
 
@@ -18,7 +19,7 @@ def make_browser(unit_id, treatment_id):
         log_file=log_file,
         unit_id=unit_id,
         treatment_id=treatment_id,
-        headless=False,
+        headless=browser.CONFIGURED_FOR_HEADLESS,
         proxy=None
     )
     return b
@@ -71,4 +72,4 @@ adfisher.do_experiment(make_unit=make_browser,
                        exp_flag=True,
                        analysis_flag=False,
                        treatment_names=["control", "experimental"]
-)
+                       )

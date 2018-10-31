@@ -1,5 +1,7 @@
-import time, re
-import converter 
+from __future__ import print_function
+import time
+import re
+import converter
 
 # for plotting
 import numpy as np
@@ -60,7 +62,7 @@ def histogramPlots(list):
 	#plt.axis([-1, len(obs[2]), 0, len(ran1)/2+10])
 	plt.legend()
 	plt.show()
-	
+
 def temporalPlots(list):
 	obs = np.array(converter.temp_ad_vectors(list))
 	#obs = np.array(ad_temp_category(list))
@@ -82,4 +84,3 @@ def temporalPlots(list):
 	#plt.axis([-1, 500, 0, 700])
 	plt.legend()
 	plt.show()
-	

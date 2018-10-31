@@ -1,3 +1,4 @@
+from __future__ import print_function
 import time
 import re                       # time.sleep, re.split
 import sys                      # some prints
@@ -10,6 +11,28 @@ from datetime import datetime   # for tagging log with datetime
 # from selenium.webdriver.common.proxy import *  # for proxy settings
 from selenium.webdriver.common.proxy import Proxy, ProxyType
 from html.parser import HTMLParser
+
+
+CONFIGURED_FOR_HEADLESS = False
+try:
+    from xvfbwrapper import Xvfb
+
+    if not Xvfb().xvfb_exists():
+        raise Exception("xvfbwrapper installed but xvfb is not. Try 'sudo apt-get install xvfb'.")
+
+    print("Headless testing using Xvfb available.")
+
+    CONFIGURED_FOR_HEADLESS = True
+except Exception:
+    pass
+
+
+CONFIGURED_FOR_HEADED = "DISPLAY" in os.environ
+
+if not (CONFIGURED_FOR_HEADED or CONFIGURED_FOR_HEADLESS):
+    raise Exception("Not configured for headed or headless. \n" +
+                    "To run headless: install xvfb and python package xvfbwrapper .\n" +
+                    "To run headed: run with gui and configure DISPLAY variable.")
 
 
 class MLStripper(HTMLParser):
@@ -46,16 +69,16 @@ class FormException(Exception):
 
 
 class BrowserUnit:
-
     def __init__(self, browser, log_file, unit_id, treatment_id, headless=False, proxy=None):
 
         self.headless = headless
 
-        if(headless):
-
+        if headless:
             from xvfbwrapper import Xvfb
+
             self.vdisplay = Xvfb(width=1280, height=720)
             self.vdisplay.start()
+
             # if(not self.vdisplay.start()):
             #     fo = open(log_file, "a")
             #     fo.write(str(datetime.now())+"||"+'error'+"||"+'Xvfb failure'+"||"+'failed to start'+"||"+str(unit_id)+"||"+str(treatment_id) + '\n')

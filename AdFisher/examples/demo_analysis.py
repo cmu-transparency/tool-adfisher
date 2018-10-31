@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 sys.path.insert(0, "../core")       # files from the core # noqa: E402
 

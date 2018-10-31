@@ -1,3 +1,4 @@
+from __future__ import print_function
 import time
 import sys                     # some prints
 from datetime import datetime  # for tagging log with datetime
@@ -20,18 +21,18 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
             self, browser, log_file, unit_id, treatment_id, headless, proxy=proxy
         )
 
-    def get_topstories(self):
-        """Get top news articles from Google News"""
+    def get_headlines(self):
+        """Get headlines from Google News"""
 
         self.driver.set_page_load_timeout(60)
         self.driver.get("http://news.google.com")
 
         tim = str(datetime.now())
 
-        self.print("Fetching top news stories")
+        self.print("Fetching headlines")
         topdivs = self.driver.find_elements_by_xpath("//article//h3")
 
-        self.print("Articles in Top News: ", len(topdivs))
+        self.print("Articles in headlines: ", len(topdivs))
 
         if len(topdivs) == 0:
             raise Exception(
@@ -44,23 +45,23 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
         for (i, div) in enumerate(topdivs):
             this_topdiv = div.find_element_by_xpath("./ancestor::article[1]")
 
-            title = this_topdiv \
-                    .find_element_by_xpath(".//h3//span") \
-                    .get_attribute('innerHTML')
+            title = (this_topdiv
+                     .find_element_by_xpath(".//h3//span")
+                     .get_attribute('innerHTML'))
 
-            ago = this_topdiv \
-                  .find_element_by_css_selector("time") \
-                  .get_attribute("innerHTML")
+            ago = (this_topdiv
+                   .find_element_by_css_selector("time")
+                   .get_attribute("innerHTML"))
 
             agency = "unknown"
             try:
                 agency = this_topdiv.find_element_by_xpath("div[2]//a").get_attribute("innerHTML")
-            except Exception as e:
+            except Exception:
                 pass
 
             agency = strip_tags(agency)
 
-            heading = "Top News"
+            heading = "Headlines"
 
             self.print("article %d/%d:" % (i+1, len(topdivs)), title, ago, agency)
             news = strip_tags(tim + "@|" + heading + "@|" + title + "@|" + agency + "@|" + ago)
@@ -71,6 +72,8 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
         self.print("Done getting top stories")
 
     def get_allbutsuggested(self):  # Slow execution
+        raise Exception("This method is outdated and will not work with current google news.")
+
         """Get all news articles (except suggested stories) from Google News"""
 
         self.driver.set_page_load_timeout(60)
@@ -81,7 +84,7 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
         divs = self.driver.find_elements_by_xpath(".//td[@class='lt-col']/div/div/div")
         topdivs = divs[1].find_elements_by_css_selector(
             "div.section-list-content div div.blended-wrapper.blended-wrapper-first.esc-wrapper"
-        ) # warning: never used
+        )  # warning: never used
         tds = self.driver.find_elements_by_xpath(".//td[@class='esc-layout-article-cell']")
 
         self.print("# articles: ", len(tds))
@@ -114,7 +117,7 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
                 heading = td.find_element_by_xpath(
                     "../../../../../../../../../div[@class='section-header']/div/div/h2/a/span"
                 ).get_attribute('innerHTML')
-            except:
+            except Exception:
                 pass
 
             if "Suggested" in heading:
@@ -139,8 +142,8 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
             try:
                 s = datetime.now()
 
-                if(type == 'top'):
-                    self.get_topstories()
+                if(type == 'headlines'):
+                    self.get_headlines()
 
                 elif(type == 'all'):
                     self.get_allbutsuggested()

@@ -6,23 +6,33 @@ VAGRANTFILE_API_VERSION = "2"
 
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  # config.ssh.forward_x11 = true
-  # config.ssh.forward_agent = true
 
-  # config.ssh.extra_args = "export DISPLAY=:0"
+  config.vm.define "headed" do |c|
+    c.vm.box = "ubuntu/xenial64"
 
-  # Official Ubuntu Server 14.04 LTS (Trusty Tahr) builds
-  # config.vm.box = "minimal/xenial64" # reload step fails for this one
-  config.vm.box = "ubuntu/xenial64"
+    # Provision with AdFisher dependencies
+    c.vm.provision :shell, path: "bootstrap.sh", args: "headed"
 
-  # Provision with AdFisher dependencies
-  config.vm.provision :shell, path: "bootstrap.sh"
+    c.vm.provider "virtualbox" do |v|
+      v.memory = 4096
+      v.cpus = 4
+      v.gui = true
+    end
+  end
 
-  # Give more memory. Firefox needs it.
-  config.vm.provider "virtualbox" do |v|
-    v.memory = 4096
-    v.cpus = 4
-    v.gui = true
+  # Headless VM should require lesser resources and may be necessary for running AdFisher on
+  # weak computers.
+  config.vm.define "headless" do |c|
+    c.vm.box = "ubuntu/xenial64"
+
+    # Provision with AdFisher dependencies
+    c.vm.provision :shell, path: "bootstrap.sh", args: "headless"
+
+    c.vm.provider "virtualbox" do |v|
+      v.memory = 4096
+      v.cpus = 4
+      v.gui = false
+    end
   end
 
 end

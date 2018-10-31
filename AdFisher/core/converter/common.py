@@ -1,3 +1,4 @@
+from __future__ import print_function
 import re                                       # regular expressions
 from stemming.porter2 import stem               # Porter Snowball Stemming
 from nltk.corpus import stopwords               # for removing stop-words

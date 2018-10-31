@@ -7,6 +7,7 @@ import web.pre_experiment.alexa     # collecting top sites from alexa
 import web.google_search             # interacting with Google News
 # import converter.reader             # read log and create feature vectors
 # import analysis.statistics          # statistics for significance testing
+import web.browser_unit as browser
 
 log_file = 'log.demo.txt'
 site_file = 'demo.txt'
@@ -18,7 +19,7 @@ def make_browser(unit_id, treatment_id):
         log_file=log_file,
         unit_id=unit_id,
         treatment_id=treatment_id,
-        headless=False,
+        headless=browser.CONFIGURED_FOR_HEADLESS,
         proxy=None)
 
     return b

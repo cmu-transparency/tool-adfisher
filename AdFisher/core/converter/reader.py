@@ -1,13 +1,15 @@
+from __future__ import print_function
 import re
 import sys
 import numpy as np
-from datetime import datetime, timedelta            # to read timestamps reloadtimes
+from datetime import datetime, timedelta  # to read timestamps reloadtimes
 from . import adVector
 from . import ad
 from . import common
 from . import interest
-from . import news         # common, ad ad_vector, interest, news classes
-from nltk.corpus import stopwords                   # for removing stop-words
+from . import news                  # common, ad ad_vector, interest, news classes
+from nltk.corpus import stopwords   # for removing stop-words
+from io import open                 # need encoding option for open
 
 
 # ------------- to convert Ad Vectors to feature vectors ---------------#
@@ -242,9 +244,9 @@ def read_log(log_file):
     par_adv = []
 
     measured = False  # warning: assigned but never used
-    sys.stdout.write("Reading log")
+    print("Reading log %s" % log_file)
 
-    fo = open(log_file, "r")
+    fo = open(log_file, "r", encoding='utf8')
 
     for line in fo:
         tim, linetype, linename, value, unit_id, treatment_id = interpret_log_line(line)
@@ -256,11 +258,10 @@ def read_log(log_file):
 
             elif(linename == 'treatnames'):
                 treatnames = re.split("\@\|", value)
-                # print("Treatments: ", treatnames)
+                print("Treatments: ", treatnames)
 
             elif(linename == 'block_id start'):
-                sys.stdout.write(".")
-                sys.stdout.flush()
+
                 block_id = int(value)  # warning: assigned but never used
                 adv = []
                 ints = []
@@ -269,7 +270,7 @@ def read_log(log_file):
                     adv.append(adVector.AdVector())
                     ints.append(interest.Interests())
                     newsv.append(news.NewsVector())
-                print(block_id)
+                print("Reading block %d." % block_id)
 
             elif(linename == 'assignment'):
                 assignment = [int(x) for x in re.split("\@\|", value)]
@@ -302,8 +303,7 @@ def read_log(log_file):
             print("Error in block", block_id, ": ", line.strip())
             pass
 
-    sys.stdout.write(".Reading complete\n")
-    print("Treatments: ", treatnames)
+    print("Reading complete\n")
 
     fo.close()
 

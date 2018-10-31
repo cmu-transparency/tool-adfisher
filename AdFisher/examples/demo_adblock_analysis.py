@@ -21,9 +21,9 @@ def load_ads_from_json(log_name, session):
     ad_lines = []
 
     for line in raw_ad_lines:
-        # parse line back into a named tuple, properly encoding to utf-8
+        # parse line back into a named tuple, properly encoding to utf8
         utf8_line = map(
-            lambda s: (s.encode('utf-8')
+            lambda s: (s.encode('utf8')
                        if not isinstance(s, dict) and not isinstance(s, int)
                        else s),
             line)
