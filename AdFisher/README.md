@@ -83,7 +83,7 @@ development and testing experiments.
 
 1. git clone https://github.com/cmu-transparency/tool-adfisher
 
-2. vagrant up
+2. vagrant up (headless | headed)
 
 This defaults to an Ubuntu (Xenial) build and will have the AdFisher source directory synced to
 /vagrant on the virtual machine. You can SSH into this machine with `vagrant ssh`.
