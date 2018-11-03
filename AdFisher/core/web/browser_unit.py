@@ -112,7 +112,7 @@ class BrowserUnit:
                 self.print("Unidentified Platform")
                 sys.exit(0)
 
-            self.driver.implicitly_wait(20)
+            # self.driver.implicitly_wait(20)
 
         elif browser == 'chrome':
 

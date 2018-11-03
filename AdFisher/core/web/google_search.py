@@ -97,6 +97,7 @@ class GoogleSearchUnit(browser_unit.BrowserUnit):
         for line in fo:     # For all queries in the list, obtain search results on Google
             s = 0
             r = 0
+            errors = 0
             q = line.strip()
 
             self.print("search query: ", q)
@@ -121,23 +122,45 @@ class GoogleSearchUnit(browser_unit.BrowserUnit):
                 self.driver.save_screenshot(str(self.unit_id)+'_search'+str(s)+'.jpg')
                 s += 1
 
-            for y in range(0, clickcount):  # How many search results to visit
+            clicked = 0
+            y = -1
+            while clicked < clickcount:
+                time.sleep(clickdelay)
 
+                y += 1
+                # for y in range(0, clickcount):  # How many search results to visit
                 try:
-
                     results = self.driver.find_elements_by_css_selector("a h3")
                     if y == 0:
-                        self.print("num results: ", len(results))
+                        self.print("num links: ", len(results))
 
                     if len(results) == 0:
-                        self.print("Could not find any google search results to follow.")
+                        # self.print("Could not find any google search results to follow.")
                         raise Exception("no links found to visit")
+
+                    if y + 1 > len(results):
+                        wanted_clickcount = clickcount
+                        clickcount = clicked
+                        raise Exception(
+                            "No more links. Stopping at %d/%d visited."
+                            % (clicked, wanted_clickcount)
+                        )
+
+                    if not results[y].is_displayed():
+                        self.print(
+                            "WARNING: link %d/%d (%s) is not visible, skipping" %
+                            (y+1, len(results), str(results[y].tag_name))
+                            )
+                        continue
 
                     results[y].click()
 
-                    time.sleep(1)
+                    self.print(
+                        "visiting link (%d/%d), click (%d/%d): "
+                        % (y+1, len(results), clicked+1, clickcount), self.driver.current_url
+                    )
 
-                    self.print("visited (%d/%d): " % (y+1, clickcount), self.driver.current_url)
+                    time.sleep(1)
 
                     link = self.driver.current_url
 
@@ -150,8 +173,17 @@ class GoogleSearchUnit(browser_unit.BrowserUnit):
                     r += 1
                     s = r + 0
 
+                    clicked += 1
+
                 except Exception as e:
                     self.print(e)
+
+                    errors += 1
+                    if errors >= 2:
+                        self.print(
+                            "Had error too many times, giving up on visiting more search results."
+                        )
+                        clicked = clickcount
 
                     self.log('error', 'visiting', 'google searchresults')
                     s += 1

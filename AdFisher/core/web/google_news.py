@@ -36,7 +36,8 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
 
         if len(topdivs) == 0:
             raise Exception(
-                "Could not find any news stories in the page. Formatting of Google News might have changed."
+                "Could not find any news stories in the page. " +
+                "Formatting of Google News might have changed."
             )
 
         # sys.stdout.write(".")
@@ -61,7 +62,7 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
 
             agency = strip_tags(agency)
 
-            heading = "Headlines"
+            heading = "headlines"
 
             self.print("article %d/%d:" % (i+1, len(topdivs)), title, ago, agency)
             news = strip_tags(tim + "@|" + heading + "@|" + title + "@|" + agency + "@|" + ago)
@@ -69,10 +70,12 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
 
             self.log('measurement', 'news', news)
 
-        self.print("Done getting top stories")
+        self.print("Done getting headlines")
 
     def get_allbutsuggested(self):  # Slow execution
-        raise Exception("This method is outdated and will not work with current google news.")
+        raise Exception(
+            "This method is outdated and will not work with current google news as of 2018-11-02."
+        )
 
         """Get all news articles (except suggested stories) from Google News"""
 
@@ -111,7 +114,7 @@ class GoogleNewsUnit(google_ads.GoogleAdsUnit):
                 ".//div[@class='esc-lead-snippet-wrapper']"
             ).get_attribute('innerHTML')
 
-            heading = "Top News"
+            heading = "Headlines"
 
             try:
                 heading = td.find_element_by_xpath(

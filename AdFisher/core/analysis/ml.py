@@ -231,11 +231,6 @@ def crossVal_algo(k, algo, params, X, y,
             print("val=", p)
         score = 0.0
 
-        if len(X) < k:
-            print("There are insufficient number of samples to do a train/test split.")
-            print("Number if samples is", len(X), "while the number of splits is", k, ".")
-            raise Exception("Insufficient samples.")
-
         for train, test in rs2.split(X):  # migrate
 
             X_train, y_train, X_test, y_test = X[train], y[train], X[test], y[test]

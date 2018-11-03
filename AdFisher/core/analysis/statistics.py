@@ -8,13 +8,14 @@ from datetime import datetime               # counting times for running tests
 
 from itertools import combinations as comb  # permutations for old permutation test
 import random                               # for random shuffles
+from builtins import input
 
 
 # functions computing Statistics #
 
 def correctly_classified(ypred, ylabel):   # number of correctly classified instances in blocks
     if(ypred.shape != ylabel.shape):
-        raw_input("ypred, ylabel not of same shape!")
+        input("ypred, ylabel not of same shape!")
         print("Exiting...")
         sys.exit(0)
     blocks = ypred.shape[0]
@@ -39,10 +40,10 @@ def difference(X_test, y_test):
             elif y_test[i][j] == 0:
                 kw0 += X_test[i][j]
             else:
-                raw_input("More classes than expected")
+                input("More classes than expected")
                 print("Exiting...")
                 sys.exit(0)
-#   print kw1, kw0
+    # print kw1, kw0
     return (kw1 - kw0)
 
 
@@ -60,7 +61,7 @@ def cosine_distance(X_test, y_test):
             elif y_test[i][j] == 0:
                 out0 += X_test[i][j]
             else:
-                raw_input("More classes than expected")
+                input("More classes than expected")
                 print("Exiting...")
                 sys.exit(0)
     return spatial.distance.cosine(out0, out1)
@@ -76,12 +77,12 @@ def print_frequencies(X, y, features, topk0, topk1):
         for k in range(0, 2):
             out[k] = np.add(out[k], np.sum(X[j][np.where(y[j] == k)], axis=0))
             # print out
-            # raw_input("hool")
+            # input("hool")
 
     print("Frequency of top ads:\n")
     for i in range(0, len(topk0)):
         index = topk0[i]
-#         print index,
+        # print index,
         features.choose_by_index(index).display()
         print(out[:, index])
         print("----------------------------------")
@@ -89,7 +90,7 @@ def print_frequencies(X, y, features, topk0, topk1):
     print("%%%%----------------------------------%%%%")
     for i in range(0, len(topk1)):
         index = topk1[i]
-#         print index,
+        # print index,
         features.choose_by_index(index).display()
         print(out[:, index])
         print("----------------------------------")
@@ -110,7 +111,7 @@ def print_counts(X, y):                                          # check
     print("Number of agents in a block: ", X.shape[1])
     print("Size of feature vector: ", X.shape[2])
     print("Total count of features: ", int(sum(sum(sum(X)))))
-    ua,uind = np.unique(y, return_inverse=True)
+    ua, uind = np.unique(y, return_inverse=True)
     count = np.bincount(uind)
     counts = [0]*len(ua)
     ucounts = [0]*len(ua)
